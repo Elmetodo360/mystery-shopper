@@ -193,13 +193,13 @@ function renderQuestions() {
       let answersHtml = '';
       if (q.type === 'yesno') {
         answersHtml = `
-          <div class="answer-row">
+          <div class="answer-row answer-row-yesno">
             <button type="button" class="ans-btn" data-val="si" data-q="${q.id}">Sí</button>
             <button type="button" class="ans-btn" data-val="no" data-q="${q.id}">No</button>
             <button type="button" class="ans-btn" data-val="na" data-q="${q.id}">N/A</button>
           </div>`;
       } else {
-        answersHtml = `<div class="answer-row">`;
+        answersHtml = `<div class="answer-row answer-row-score">`;
         for (let s = 0; s <= 5; s++) {
           answersHtml += `<button type="button" class="ans-btn" data-type="score" data-val="${s}" data-q="${q.id}">${s}</button>`;
         }

@@ -287,11 +287,16 @@ h3 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
-  flex-wrap: wrap;
 }
+.answer-row-yesno { flex-wrap: wrap; }
+.answer-row-yesno .ans-btn { flex: 1; min-width: 60px; }
+.answer-row-score {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+.answer-row-score .ans-btn { min-width: 0; padding: 10px 0; }
 .answer-row .ans-btn {
-  flex: 1;
-  min-width: 60px;
   padding: 10px 0;
   border: 1px solid var(--c-border);
   background: #fff;
@@ -301,10 +306,10 @@ h3 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin
   cursor: pointer;
   color: var(--c-text);
 }
-.answer-row .ans-btn[data-val="si"].active { background: var(--c-success); color: #fff; border-color: var(--c-success); }
-.answer-row .ans-btn[data-val="no"].active { background: var(--c-error); color: #fff; border-color: var(--c-error); }
-.answer-row .ans-btn[data-val="na"].active { background: var(--c-na); color: #fff; border-color: var(--c-na); }
-.answer-row .ans-btn[data-type="score"].active { background: var(--c-burdeos); color: #fff; border-color: var(--c-burdeos); }
+.ans-btn[data-val="si"].active { background: var(--c-success); color: #fff; border-color: var(--c-success); }
+.ans-btn[data-val="no"].active { background: var(--c-error); color: #fff; border-color: var(--c-error); }
+.ans-btn[data-val="na"].active { background: var(--c-na); color: #fff; border-color: var(--c-na); }
+.ans-btn[data-type="score"].active { background: var(--c-burdeos); color: #fff; border-color: var(--c-burdeos); }
 
 .q-photo-row {
   display: flex;
@@ -598,8 +603,8 @@ h3 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin
   margin-bottom: 14px;
 }
 .global-stars .stars { justify-content: center; gap: 8px; }
-.global-stars .star svg { width: 40px; height: 40px; }
-.global-stars .star svg:not(.active) { fill: rgba(255,255,255,0.2); }
+.global-stars .star svg { width: 40px; height: 40px; fill: rgba(255,255,255,0.2); }
+.global-stars .star.active svg { fill: var(--c-dorado); }
 
 /* ============ DASHBOARD ============ */
 
