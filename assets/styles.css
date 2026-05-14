@@ -76,34 +76,38 @@ header.app-header {
 .app-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 .app-logo .logo-mark {
-  width: 36px;
-  height: 36px;
+  width: 52px;
+  height: 52px;
   flex-shrink: 0;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px;
+  object-fit: contain;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 .app-logo .logo-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.1;
+  line-height: 1.15;
 }
-.app-logo .logo-text .brand {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #fff;
-}
-.app-logo .logo-text .brand .accent { color: var(--c-dorado); }
 .app-logo .logo-text .sublabel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.app-logo .logo-text .sublabel-sub {
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: 11px;
   color: var(--c-dorado);
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
+  margin-top: 2px;
 }
 
 header.app-header .header-right {
