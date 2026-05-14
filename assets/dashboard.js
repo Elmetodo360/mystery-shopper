@@ -144,6 +144,28 @@ async function renderVisitDetail(visitId) {
       if (blob) photosEls.push({ qid: q.id, qtext: q.text, url: URL.createObjectURL(blob) });
     }
   }
+  // Fotos de platos
+  const dishPhotoUrls = [];
+  if (Array.isArray(v.dishes)) {
+    for (let i = 0; i < v.dishes.length; i++) {
+      const d = v.dishes[i];
+      if (d && d.photoId) {
+        const blob = await MS_STORAGE.getPhoto(d.photoId);
+        if (blob) dishPhotoUrls.push({ idx: i, url: URL.createObjectURL(blob) });
+      }
+    }
+  }
+  // Foto del ticket
+  let ticketUrl = null;
+  if (v.ticketPhotoId) {
+    const blob = await MS_STORAGE.getPhoto(v.ticketPhotoId);
+    if (blob) ticketUrl = URL.createObjectURL(blob);
+  }
+
+  // Productividad (clientes por camarero) — entrada y salida
+  const hc = v.headcount || {};
+  const prodIn  = (hc.inStaff && hc.inClients != null)   ? (hc.inClients / hc.inStaff).toFixed(1)   : null;
+  const prodOut = (hc.outStaff && hc.outClients != null) ? (hc.outClients / hc.outStaff).toFixed(1) : null;
 
   let html = `
     <button class="btn btn-ghost" id="backToListBtn" style="margin-bottom:12px">Volver</button>
@@ -159,8 +181,14 @@ async function renderVisitDetail(visitId) {
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
-          <div style="font-size:13px; color:var(--c-muted)">Score global</div>
+          <div style="font-size:13px; color:var(--c-muted)">Score global checklist</div>
           <div class="v-score ${scoreClass(pct)}" style="font-size:36px">${pct != null ? pct + '%' : '—'}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:13px; color:var(--c-muted)">Valoración auditor</div>
+          <div style="font-size:24px; color: var(--c-dorado); font-family: var(--font-display); font-weight:700;">
+            ${renderStarsRO(v.ratings && v.ratings.global)}
+          </div>
         </div>
         <div style="text-align:right; font-size:13px; color:var(--c-muted)">
           Estado: <strong>${v.status === 'submitted' ? 'Enviada' : 'Borrador'}</strong><br />
@@ -168,6 +196,45 @@ async function renderVisitDetail(visitId) {
         </div>
       </div>
     </div>
+
+    <h3>Datos operativos (productividad)</h3>
+    <div class="card">
+      <table style="width:100%; font-size:14px; border-collapse:collapse;">
+        <tr style="border-bottom:1px solid var(--c-border); color: var(--c-muted); font-size:12px; text-transform:uppercase; letter-spacing:1px;">
+          <th style="text-align:left; padding:8px 4px;">Momento</th>
+          <th style="text-align:right; padding:8px 4px;">Hora</th>
+          <th style="text-align:right; padding:8px 4px;">Clientes</th>
+          <th style="text-align:right; padding:8px 4px;">Camareros</th>
+          <th style="text-align:right; padding:8px 4px;">Clientes/Cam.</th>
+        </tr>
+        <tr style="border-bottom:1px solid var(--c-border);">
+          <td style="padding:10px 4px;"><strong>Entrada</strong></td>
+          <td style="text-align:right; padding:10px 4px;">${escapeHtml(v.visit && v.visit.timeIn || '—')}</td>
+          <td style="text-align:right; padding:10px 4px;">${hc.inClients != null ? hc.inClients : '—'}</td>
+          <td style="text-align:right; padding:10px 4px;">${hc.inStaff != null ? hc.inStaff : '—'}</td>
+          <td style="text-align:right; padding:10px 4px;"><strong>${prodIn || '—'}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding:10px 4px;"><strong>Salida</strong></td>
+          <td style="text-align:right; padding:10px 4px;">${escapeHtml(v.visit && v.visit.timeOut || '—')}</td>
+          <td style="text-align:right; padding:10px 4px;">${hc.outClients != null ? hc.outClients : '—'}</td>
+          <td style="text-align:right; padding:10px 4px;">${hc.outStaff != null ? hc.outStaff : '—'}</td>
+          <td style="text-align:right; padding:10px 4px;"><strong>${prodOut || '—'}</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    ${renderRatingsBlockHTML(v.ratings)}
+
+    ${renderDishesBlockHTML(v.dishes, dishPhotoUrls)}
+
+    ${ticketUrl ? `
+      <h3>Ticket de la visita</h3>
+      <div class="card" style="text-align:center;">
+        <img src="${ticketUrl}" style="max-width:100%; max-height:400px; border-radius:6px; border:1px solid var(--c-border); cursor:pointer;" data-full="${ticketUrl}" class="ticket-img" />
+        <div style="font-size:13px; color:var(--c-muted); margin-top:8px;">Importe declarado: ${v.visit && v.visit.ticket ? v.visit.ticket.toFixed(2) + ' €' : '—'}</div>
+      </div>
+    ` : ''}
 
     <h3>Score por bloque</h3>
     <div class="card block-scores">
@@ -232,6 +299,8 @@ async function renderVisitDetail(visitId) {
     els.visitList.style.display = '';
     els.kpiGrid.style.display = '';
     photosEls.forEach(p => URL.revokeObjectURL(p.url));
+    dishPhotoUrls.forEach(d => URL.revokeObjectURL(d.url));
+    if (ticketUrl) URL.revokeObjectURL(ticketUrl);
   });
 
   document.getElementById('exportPdfBtn').addEventListener('click', () => window.print());
@@ -248,11 +317,19 @@ async function renderVisitDetail(visitId) {
 
   document.getElementById('deleteVisitBtn').addEventListener('click', () => {
     if (!confirm('¿Eliminar esta visita? No se puede deshacer.')) return;
-    // borrar fotos
+    // borrar fotos de respuestas
     for (const q of flat) {
       const a = (v.answers || {})[q.id];
       if (a && a.photoId) MS_STORAGE.deletePhoto(a.photoId).catch(() => {});
     }
+    // borrar fotos de platos
+    if (Array.isArray(v.dishes)) {
+      for (const d of v.dishes) {
+        if (d && d.photoId) MS_STORAGE.deletePhoto(d.photoId).catch(() => {});
+      }
+    }
+    // borrar foto del ticket
+    if (v.ticketPhotoId) MS_STORAGE.deletePhoto(v.ticketPhotoId).catch(() => {});
     MS_STORAGE.deleteVisit(v.id);
     els.visitDetail.style.display = 'none';
     els.visitList.style.display = '';
@@ -261,10 +338,90 @@ async function renderVisitDetail(visitId) {
     showToast('Visita eliminada');
   });
 
-  // Lightbox
-  els.visitDetail.querySelectorAll('.gallery img').forEach(img => {
-    img.addEventListener('click', () => openLightbox(img.dataset.full));
+  // Lightbox (galería + ticket + platos)
+  els.visitDetail.querySelectorAll('.gallery img, .ticket-img, .dish-photo-img').forEach(img => {
+    img.addEventListener('click', () => openLightbox(img.dataset.full || img.src));
   });
+}
+
+// ============ Helpers de visualización ============
+
+const RATING_CATEGORIES_LABELS = [
+  { key: 'producto',      label: 'Producto' },
+  { key: 'servicio',      label: 'Servicio y trato' },
+  { key: 'ambiente',      label: 'Ambiente' },
+  { key: 'limpieza',      label: 'Limpieza e higiene' },
+  { key: 'calidadPrecio', label: 'Relación calidad-precio' },
+];
+
+const DISH_CRITERIA_LABELS = [
+  { key: 'presentation', label: 'Presentación' },
+  { key: 'taste',        label: 'Sabor' },
+  { key: 'temperature',  label: 'Temperatura' },
+  { key: 'quantity',     label: 'Cantidad' },
+];
+
+function renderStarsRO(val) {
+  // estrellas read-only en SVG
+  if (val == null) return '<span style="color: var(--c-muted); font-size:14px">sin valorar</span>';
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    const active = i <= val;
+    html += `<svg viewBox="0 0 24 24" style="width:20px; height:20px; fill: ${active ? 'var(--c-dorado)' : '#ddd'}; vertical-align:middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+  }
+  html += ` <span style="font-size:14px; color:var(--c-text); margin-left:4px;">${val}/5</span>`;
+  return html;
+}
+
+function renderRatingsBlockHTML(ratings) {
+  if (!ratings) return '';
+  const rows = RATING_CATEGORIES_LABELS.map(c => `
+    <div class="star-row">
+      <div class="star-label">${c.label}</div>
+      <div>${renderStarsRO(ratings[c.key])}</div>
+    </div>
+  `).join('');
+  return `
+    <h3>Valoración del auditor (5 ámbitos)</h3>
+    <div class="card">
+      ${rows}
+    </div>
+  `;
+}
+
+function renderDishesBlockHTML(dishes, dishPhotoUrls) {
+  if (!Array.isArray(dishes)) return '';
+  const filled = dishes.filter(d => d && (d.name || d.presentation != null || d.taste != null || d.temperature != null || d.quantity != null || d.photoId));
+  if (filled.length === 0) return '';
+  const photosByIdx = {};
+  dishPhotoUrls.forEach(d => photosByIdx[d.idx] = d.url);
+  const cards = dishes.map((d, idx) => {
+    if (!d || (!d.name && d.presentation == null && d.taste == null && d.temperature == null && d.quantity == null && !d.photoId)) return '';
+    const scores = DISH_CRITERIA_LABELS.map(c => d[c.key]).filter(v => v != null);
+    const avg = scores.length ? (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1) : null;
+    const critsHtml = DISH_CRITERIA_LABELS.map(c => `
+      <tr>
+        <td style="padding:4px 8px 4px 0; color: var(--c-grafito); font-size:13px;">${c.label}</td>
+        <td style="padding:4px 0; text-align:right;"><strong>${d[c.key] != null ? d[c.key] + ' / 5' : '—'}</strong></td>
+      </tr>
+    `).join('');
+    return `
+      <div class="dish-card">
+        <div class="dish-header">
+          <span class="dish-num">Plato ${idx + 1}${d.name ? ' — ' + escapeHtml(d.name) : ''}</span>
+          <span class="dish-score-summary">${avg ? avg + ' / 5' : '—'}</span>
+        </div>
+        <div style="display:grid; grid-template-columns: ${photosByIdx[idx] ? '1fr 1fr' : '1fr'}; gap: 12px; align-items:start;">
+          <table style="width:100%; border-collapse:collapse;">${critsHtml}</table>
+          ${photosByIdx[idx] ? `<img class="dish-photo-img" src="${photosByIdx[idx]}" style="width:100%; max-height:160px; object-fit:cover; border-radius:6px; border:1px solid var(--c-border); cursor:pointer;" data-full="${photosByIdx[idx]}" />` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  return `
+    <h3>Valoración de platos</h3>
+    ${cards}
+  `;
 }
 
 function computeBlockScores(v) {
@@ -340,12 +497,19 @@ els.importFile.addEventListener('change', async (e) => {
     if (!obj.id || !obj.answers) throw new Error('JSON inválido');
     // Restaurar fotos desde base64 si vienen
     if (obj.photos) {
-      for (const qid of Object.keys(obj.photos)) {
-        const b64 = obj.photos[qid];
+      for (const key of Object.keys(obj.photos)) {
+        const b64 = obj.photos[key];
         const blob = await dataUrlToBlob(b64);
-        const photoId = `${obj.id}_${qid}_imported`;
+        const photoId = `${obj.id}_${key}_imported`;
         await MS_STORAGE.savePhoto(photoId, blob);
-        if (obj.answers[qid]) obj.answers[qid].photoId = photoId;
+        if (key === 'ticket') {
+          obj.ticketPhotoId = photoId;
+        } else if (key.startsWith('dish_')) {
+          const idx = parseInt(key.replace('dish_', ''), 10);
+          if (Array.isArray(obj.dishes) && obj.dishes[idx]) obj.dishes[idx].photoId = photoId;
+        } else if (obj.answers && obj.answers[key]) {
+          obj.answers[key].photoId = photoId;
+        }
       }
       delete obj.photos;
     }

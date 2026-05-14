@@ -127,14 +127,28 @@ function setAdminLogged(v) {
 async function exportVisitWithPhotos(visit) {
   const out = JSON.parse(JSON.stringify(visit));
   out.photos = {};
+  // Fotos de respuestas (keys MS-01, MS-02, ...)
   for (const ansKey of Object.keys(visit.answers || {})) {
     const ans = visit.answers[ansKey];
     if (ans && ans.photoId) {
       const blob = await getPhoto(ans.photoId);
-      if (blob) {
-        out.photos[ansKey] = await blobToBase64(blob);
+      if (blob) out.photos[ansKey] = await blobToBase64(blob);
+    }
+  }
+  // Fotos de platos (keys dish_0, dish_1, ...)
+  if (Array.isArray(visit.dishes)) {
+    for (let i = 0; i < visit.dishes.length; i++) {
+      const d = visit.dishes[i];
+      if (d && d.photoId) {
+        const blob = await getPhoto(d.photoId);
+        if (blob) out.photos[`dish_${i}`] = await blobToBase64(blob);
       }
     }
+  }
+  // Foto del ticket (key ticket)
+  if (visit.ticketPhotoId) {
+    const blob = await getPhoto(visit.ticketPhotoId);
+    if (blob) out.photos['ticket'] = await blobToBase64(blob);
   }
   return out;
 }
