@@ -2,6 +2,12 @@
 // localStorage para metadata y respuestas
 // IndexedDB para fotos (binarios pesados)
 
+// URL del backend Apps Script. Hardcoded para que TODOS los navegadores
+// (admin y auditores) sincronicen al mismo Sheet sin necesidad de configurar.
+// Si quieres mover el backend a otro proyecto Apps Script, cambia esta URL
+// y vuelve a subir storage.js al repo.
+const MS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxkDKQ53JRRziEQU7I43Za6N3jspiMhQPkI1kpBamdwrCNzgFPduQSG5YOqCO7Z5toQ/exec';
+
 const LS_KEY_PREFIX = 'ms360_visit_';
 const LS_KEY_VISITS_INDEX = 'ms360_visits_index';
 const LS_KEY_ADMIN = 'ms360_admin';
@@ -110,7 +116,12 @@ function generateVisitCode() {
 
 function getConfig() {
   const raw = localStorage.getItem(LS_KEY_CONFIG);
-  return raw ? JSON.parse(raw) : { syncUrl: '', adminCode: 'METODO360' };
+  const stored = raw ? JSON.parse(raw) : {};
+  // Default: usa la URL hardcoded del código si no hay override en localStorage
+  return {
+    syncUrl: stored.syncUrl || MS_BACKEND_URL,
+    adminCode: stored.adminCode || 'METODO360',
+  };
 }
 function saveConfig(cfg) {
   localStorage.setItem(LS_KEY_CONFIG, JSON.stringify(cfg));

@@ -575,22 +575,25 @@ async function onNextClick() {
     visit.status = 'submitted';
     visit.submittedAt = Date.now();
     MS_STORAGE.saveVisit(visit);
+    let sendOk = false;
     try {
       const cfg = MS_STORAGE.getConfig();
       if (cfg.syncUrl) {
         showToast('Enviando informe…');
-        await MS_STORAGE.syncVisitToBackend(visit);
+        const resp = await MS_STORAGE.syncVisitToBackend(visit);
+        if (resp && resp.ok === false) throw new Error('Backend respondió error: ' + (resp.error || 'desconocido'));
         showToast('Informe enviado al servidor');
+        sendOk = true;
       } else {
         await downloadVisitJson();
         showToast('Descargado. Envíalo al equipo.');
       }
     } catch (err) {
       console.error(err);
-      showToast('Sin conexión. Descargando JSON local…', true);
       await downloadVisitJson();
+      alert('No se pudo enviar al servidor (' + err.message + ').\n\nSe ha descargado un fichero JSON en tu móvil. Mándaselo a Chema por WhatsApp o email para que lo importe manualmente.');
     }
-    setTimeout(() => { window.location.href = 'gracias.html'; }, 1200);
+    setTimeout(() => { window.location.href = 'gracias.html'; }, sendOk ? 1200 : 200);
   }
 }
 
