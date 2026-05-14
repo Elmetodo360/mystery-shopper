@@ -572,6 +572,9 @@ async function onNextClick() {
     if (!visit.ticketPhotoId) { showToast('Falta la foto del ticket', true); return; }
     if (visit.ratings.global == null) { showToast('Falta la valoración global (estrellas)', true); return; }
 
+    // Bloquea el botón para evitar doble envío
+    els.nextBtn.disabled = true;
+    els.nextBtn.textContent = 'Enviando…';
     visit.status = 'submitted';
     visit.submittedAt = Date.now();
     MS_STORAGE.saveVisit(visit);
