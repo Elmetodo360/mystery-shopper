@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Dashboard — Mystery Shopper · El Método 360</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="brand-tag">El Método 360</div>
+      <h1>Dashboard Mystery Shopper</h1>
+    </div>
+    <button class="btn btn-ghost" id="logoutBtn" style="padding:6px 12px; font-size:12px; display:none">Salir</button>
+  </header>
+
+  <main class="container">
+    <section id="loginSection">
+      <div class="card" style="max-width:400px; margin: 40px auto;">
+        <h3 style="margin-top:0">Acceso interno</h3>
+        <p style="margin-top:0; color: var(--c-muted); font-size: 14px;">Introduce el código de admin de El Método 360.</p>
+        <div class="field">
+          <input type="password" id="adminCodeInput" placeholder="Código admin" />
+        </div>
+        <button class="btn btn-primary btn-block" id="adminLoginBtn">Entrar</button>
+      </div>
+    </section>
+
+    <section id="dashboardSection" style="display:none">
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 12px;">
+        <button class="btn btn-accent" id="newVisitBtn">Generar enlace de visita</button>
+        <button class="btn btn-ghost" id="importBtn">Importar JSON</button>
+        <button class="btn btn-ghost" id="configBtn">Configuración</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none" />
+
+      <h2 style="margin-top:8px">Resumen</h2>
+      <div class="dash-grid" id="kpiGrid"></div>
+
+      <h2>Visitas</h2>
+      <div class="visit-list" id="visitList"></div>
+
+      <div id="visitDetail" style="display:none; margin-top: 32px;"></div>
+    </section>
+
+    <div id="modalContainer"></div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/storage.js"></script>
+  <script src="assets/checklist.js"></script>
+  <script src="assets/dashboard.js"></script>
+</body>
+</html>

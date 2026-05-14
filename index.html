@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Mystery Shopper — El Método 360</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="brand-tag">El Método 360</div>
+      <h1>Mystery Shopper</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Bienvenido</h2>
+    <p class="subtitle">Sistema interno de auditoría de hostelería para auditores externos y para el equipo de El Método 360.</p>
+
+    <div class="card">
+      <h3 style="margin-top:0">Soy auditor</h3>
+      <p style="margin-top:0; color: var(--c-muted); font-size: 14px;">Introduce el código de visita que te ha pasado El Método 360 para empezar tu auditoría.</p>
+      <div class="field">
+        <label for="codeInput">Código de visita</label>
+        <input type="text" id="codeInput" placeholder="Ej.: AB12CD" autocapitalize="characters" autocomplete="off" maxlength="10" />
+      </div>
+      <button class="btn btn-primary btn-block" id="goVisitBtn">Empezar visita</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Soy del equipo El Método 360</h3>
+      <p style="margin-top:0; color: var(--c-muted); font-size: 14px;">Accede al dashboard para ver los informes de las visitas.</p>
+      <button class="btn btn-ghost btn-block" id="goDashboardBtn">Ir al dashboard</button>
+    </div>
+
+    <p style="font-size:11px; color: var(--c-muted); text-align:center; margin-top: 24px;">
+      v1.0 · El Método 360 Consultoría Integral
+    </p>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/storage.js"></script>
+  <script>
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+    document.getElementById('goVisitBtn').addEventListener('click', () => {
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      if (!code) { showToast('Introduce un código primero'); return; }
+      window.location.href = 'visita.html?code=' + encodeURIComponent(code);
+    });
+    document.getElementById('codeInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('goVisitBtn').click();
+    });
+    document.getElementById('goDashboardBtn').addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+
+    // Pre-llenar código si viene en la URL
+    const urlCode = new URLSearchParams(location.search).get('code');
+    if (urlCode) document.getElementById('codeInput').value = urlCode.toUpperCase();
+  </script>
+</body>
+</html>

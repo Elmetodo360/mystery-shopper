@@ -1,0 +1,23 @@
+{
+  "name": "Mystery Shopper — El Método 360",
+  "short_name": "Mystery 360",
+  "description": "Auditoría de hostelería del customer journey en 50 puntos críticos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Visita — Mystery Shopper · El Método 360</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="brand-tag">El Método 360</div>
+      <h1>Mystery Shopper</h1>
+    </div>
+    <div style="font-size:11px; color: var(--c-accent); text-align:right;">
+      <div id="visitCode">—</div>
+    </div>
+  </header>
+
+  <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label">
+      <span id="progressText">0 / 50 respondidas</span>
+      <span id="autosaveText">Guardado automático activo</span>
+    </div>
+  </div>
+
+  <main class="container">
+    <section id="step-intro">
+      <h2>Antes de empezar</h2>
+      <p class="subtitle">Rellena los datos básicos de la visita. Toda la información se guarda en tu móvil y se envía solo cuando pulses "Finalizar y enviar".</p>
+
+      <div class="card">
+        <div class="field">
+          <label for="auditorName">Tu nombre y apellidos *</label>
+          <input type="text" id="auditorName" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="auditorEmail">Tu email (para que podamos contactarte si surge duda)</label>
+          <input type="email" id="auditorEmail" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0">Datos del local visitado</h3>
+        <div class="field">
+          <label for="localName">Nombre del local *</label>
+          <input type="text" id="localName" />
+        </div>
+        <div class="field">
+          <label for="localAddr">Dirección / ciudad</label>
+          <input type="text" id="localAddr" />
+        </div>
+        <div class="field">
+          <label for="visitType">Tipo de visita</label>
+          <select id="visitType">
+            <option value="mesa">Comida/Cena en sala</option>
+            <option value="barra">Consumo en barra</option>
+            <option value="takeaway">Take-away</option>
+            <option value="delivery">Delivery</option>
+            <option value="desayuno">Desayuno/Cafetería</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="visitDate">Fecha de la visita *</label>
+          <input type="date" id="visitDate" />
+        </div>
+        <div class="field" style="display:flex; gap: 10px;">
+          <div style="flex:1">
+            <label for="visitTimeIn">Hora entrada</label>
+            <input type="time" id="visitTimeIn" />
+          </div>
+          <div style="flex:1">
+            <label for="visitTimeOut">Hora salida</label>
+            <input type="time" id="visitTimeOut" />
+          </div>
+        </div>
+        <div class="field" style="display:flex; gap: 10px;">
+          <div style="flex:1">
+            <label for="visitGuests">Nº comensales</label>
+            <input type="number" id="visitGuests" min="1" max="20" />
+          </div>
+          <div style="flex:1">
+            <label for="visitTicket">Ticket total observado (€)</label>
+            <input type="number" id="visitTicket" min="0" step="0.01" />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="startQuestionsBtn">Comenzar las 50 preguntas</button>
+    </section>
+
+    <section id="step-questions" style="display:none">
+      <div id="questionsContainer"></div>
+    </section>
+
+    <section id="step-final" style="display:none">
+      <h2>Antes de enviar</h2>
+      <div class="card">
+        <div class="field">
+          <label for="finalNotes">Observaciones generales (lo que no encaja en las 50 preguntas)</label>
+          <textarea id="finalNotes" rows="5" placeholder="Cualquier observación adicional sobre la visita…"></textarea>
+        </div>
+        <div class="field">
+          <label for="finalSummary">Si tuvieras que resumir la visita en una frase, ¿cuál sería?</label>
+          <textarea id="finalSummary" rows="3"></textarea>
+        </div>
+      </div>
+      <p style="font-size:13px; color: var(--c-muted); text-align:center;">Comprueba que has respondido todo lo que has podido. Al enviar, la visita se cierra y no podrás editarla.</p>
+    </section>
+  </main>
+
+  <div class="action-bar" id="actionBar">
+    <button class="btn btn-ghost" id="backBtn" style="display:none">Atrás</button>
+    <button class="btn btn-primary" id="nextBtn">Siguiente</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/storage.js"></script>
+  <script src="assets/checklist.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
