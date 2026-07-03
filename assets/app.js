@@ -3,6 +3,9 @@
 const params = new URLSearchParams(location.search);
 const URL_CODE = (params.get('code') || '').toUpperCase();
 const RESUME_ID = params.get('resume') || null;
+// Deep-link desde el Panel Marco: precarga el local en visitas nuevas (no pisa las reanudadas)
+const URL_LOCAL = (params.get('local') || '').trim();
+const URL_ADDR = (params.get('addr') || '').trim();
 
 const RATING_CATEGORIES = [
   { key: 'producto',       label: 'Producto',              hint: 'Calidad de la comida y bebida' },
@@ -75,7 +78,7 @@ function newVisit() {
     createdAt: Date.now(),
     status: 'draft',
     auditor: { name: '', email: '' },
-    local: { name: '', addr: '' },
+    local: { name: URL_LOCAL, addr: URL_ADDR },
     visit: { type: 'mesa', date: '', timeIn: '', timeOut: '', guests: null, ticket: null },
     headcount: { inClients: null, inStaff: null, outClients: null, outStaff: null },
     dishes: [
