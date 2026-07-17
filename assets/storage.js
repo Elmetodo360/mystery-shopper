@@ -2,11 +2,14 @@
 // localStorage para metadata y respuestas
 // IndexedDB para fotos (binarios pesados)
 
-// URL del backend Apps Script. Hardcoded para que TODOS los navegadores
-// (admin y auditores) sincronicen al mismo Sheet sin necesidad de configurar.
-// Si quieres mover el backend a otro proyecto Apps Script, cambia esta URL
-// y vuelve a subir storage.js al repo.
-const MS_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxkDKQ53JRRziEQU7I43Za6N3jspiMhQPkI1kpBamdwrCNzgFPduQSG5YOqCO7Z5toQ/exec';
+// URL del backend. Hardcoded para que TODOS los navegadores (admin y auditores)
+// sincronicen al mismo sitio sin necesidad de configurar. Desde 2026-07-17
+// apunta a la Edge Function de Supabase (mystery-submit, proyecto EM360-CRM),
+// que guarda en la tabla mystery_visitas y sube las fotos al bucket mystery-fotos.
+// Acepta el MISMO payload que el Apps Script anterior (objeto visit + photos en
+// base64, POST text/plain) y responde {ok, score, photoCount}. Para mover el
+// backend, cambia esta URL y vuelve a subir storage.js al repo.
+const MS_BACKEND_URL = 'https://qczgcprniskfvxxetrah.supabase.co/functions/v1/mystery-submit';
 
 const LS_KEY_PREFIX = 'ms360_visit_';
 const LS_KEY_VISITS_INDEX = 'ms360_visits_index';
